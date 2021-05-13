@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// A groupable list of widgets similar to [ListView], execpt that the
@@ -177,6 +178,8 @@ class GroupedListView<T, E> extends StatefulWidget {
   /// the scroll position changes drastically.
   final double? itemExtent;
 
+  final Widget? header;
+
   /// Creates a [GroupedListView]
   GroupedListView({
     Key? key,
@@ -211,6 +214,7 @@ class GroupedListView<T, E> extends StatefulWidget {
     this.restorationId,
     this.semanticChildCount,
     this.itemExtent,
+    this.header,
   })  : assert(itemBuilder != null || indexedItemBuilder != null),
         assert(groupSeparatorBuilder != null || groupHeaderBuilder != null),
         super(key: key);
@@ -291,6 +295,25 @@ class _GroupedListViewState<T, E> extends State<GroupedListView<T, E>> {
           itemBuilder: (context, index) {
             var actualIndex = index ~/ 2;
             if (index == hiddenIndex) {
+              if (index == 0) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      child: widget.header,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      child: Opacity(
+                        opacity: widget.useStickyGroupSeparators ? 0 : 1,
+                        child:
+                            _buildGroupSeparator(_sortedElements[actualIndex]),
+                      ),
+                    )
+                  ],
+                );
+              }
               return Opacity(
                 opacity: widget.useStickyGroupSeparators ? 0 : 1,
                 child: _buildGroupSeparator(_sortedElements[actualIndex]),
